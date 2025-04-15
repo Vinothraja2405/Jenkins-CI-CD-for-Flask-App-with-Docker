@@ -1,6 +1,9 @@
 pipeline {
-    agent any
-
+   agent {
+        docker {
+            image 'python:3.9'  
+        }
+    }
     environment {
         DOCKERHUB_CREDENTIALS = credentials('dockerhub-creds') // set in Jenkins credentials
         IMAGE_NAME = 'vinothraja2405/flask-jenkins-app'
