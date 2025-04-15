@@ -9,11 +9,9 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git 'https://github.com/Vinothraja2405/Jenkins-CI-CD-for-Flask-App-with-Docker.git'
-
-            }
-        }
-
+                git branch: 'main', url: 'https://github.com/Vinothraja2405/Jenkins-CI-CD-for-Flask-App-with-Docker.git'
+                }
+            }    
         stage('Install Dependencies') {
             steps {
                 sh 'pip3 install -r app/requirements.txt'
