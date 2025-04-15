@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         IMAGE_NAME = 'vinothraja2405/flask-jenkins-app'
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub-creds')
     }
 
     stages {
@@ -14,30 +15,34 @@ pipeline {
 
         stage('Install Dependencies and Test') {
             steps {
-                sh 'docker run --rm -v $PWD:/app -w /app python:3.9 bash -c "pip install -r app/requirements.txt && pytest"'
+                script {
+                    docker.image('python:3.9').inside {
+                        sh 'pip install -r app/requirements.txt'
+                        sh 'pytest'
+                    }
+                }
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh "docker build -t ${IMAGE_NAME} ."
+                sh 'docker build -t $IMAGE_NAME .'
             }
         }
 
         stage('Push to DockerHub') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    sh """
-                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-                        docker push ${IMAGE_NAME}
-                    """
+                script {
+                    docker.withRegistry('', 'dockerhub-creds') {
+                        sh 'docker push $IMAGE_NAME'
+                    }
                 }
             }
         }
 
         stage('Cleanup') {
             steps {
-                sh "docker rmi ${IMAGE_NAME} || true"
+                sh 'docker rmi $IMAGE_NAME || true'
             }
         }
     }
