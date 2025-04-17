@@ -1,0 +1,27 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Clone from GitHub') {
+            steps {
+                echo 'Cloning repository...'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                echo 'Building static site...'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo 'Deploying locally...'
+                bat '''
+                mkdir C:\\temp\\jenkins-site
+                copy index.html C:\\temp\\jenkins-site\\
+                '''
+            }
+        }
+    }
+}
